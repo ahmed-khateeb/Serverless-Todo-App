@@ -25,6 +25,10 @@ provider:
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
     
+ # tracing:
+  #  lambda: true
+  #  apiGateway: true
+
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     TODO_TABLE: Todos-${self:provider.stage}

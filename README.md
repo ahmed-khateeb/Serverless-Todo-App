@@ -21,7 +21,7 @@ It also stores an id of a user who created a TODO item.
 
 ## Functions Implemented
 
-- `Auth` - This function implements a custom authorizer for API Gateway that should be added to all other functions.
+- `Auth` - This function implements a custom authorizer for API Gateway that should be added to all other functions by Fetch a certificate from Auth0 instead of hard coding it in an authorizer.
 
 - `GetTodos` - This function returns all TODOs for a current user. A user id can be extracted from a ***JWT*** token that is sent by the Front-End.
 
