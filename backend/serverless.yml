@@ -4,6 +4,7 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
+  - serverless-plugin-tracing
 
 custom:
   webpack:
@@ -15,6 +16,8 @@ custom:
         version: v1.0.0
         title: TODO APP API
         description: Serverless Application for TODO Items
+  serverless-iam-roles-per-function:
+    defaultInherit: true
 
 package:
   individually: true
@@ -24,10 +27,6 @@ provider:
   runtime: nodejs12.x
   apiGateway:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
-    
- # tracing:
-  #  lambda: true
-  #  apiGateway: true
 
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
@@ -38,6 +37,14 @@ provider:
 
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
+  tracing: true # enable tracing
+  iamRoleStatements:
+    - Effect: "Allow" # xray permissions (required)
+      Action:
+        - "xray:PutTraceSegments"
+        - "xray:PutTelemetryRecords"
+      Resource:
+        - "*"
 
 functions:
   Auth:
@@ -77,6 +84,7 @@ functions:
           request:
             schema:
               application/json: ${file(models/create-todo-request.json)}
+
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -121,7 +129,7 @@ functions:
     handler: src/lambda/http/updateTodo.handler
     events:
       - http:
-          method: put
+          method: patch
           path: todos/{todoId}
           authorizer: Auth
           cors: true
@@ -177,7 +185,7 @@ resources:
         ResponseParameters:
           gatewayresponse.header.Access-Control-Allow-Origin: "'*''"
           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization'"
-          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,PATCH'"
         ResponseType: DEFAULT_4XX
         RestApiId:
           Ref: 'ApiGatewayRestApi'

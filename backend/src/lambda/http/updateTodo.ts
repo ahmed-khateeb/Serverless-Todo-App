@@ -18,6 +18,15 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
   const userId = getUserId(event)
 
+  if (updatedTodo.name.trim() == "") {
+    return {
+      statusCode: 403,
+      body: JSON.stringify({
+        error: `TODO Name Can't be empty`
+      })
+    }
+  }
+
   const item = await todosAccess.getTodoById(todoId)
 
   if (item.Count == 0) {

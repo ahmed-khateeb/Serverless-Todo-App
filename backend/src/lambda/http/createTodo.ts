@@ -13,7 +13,14 @@ const logger = createLogger('todos')
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
-
+  if (newTodo.name.trim() == "") {
+    return {
+      statusCode: 403,
+      body: JSON.stringify({
+        error: `TODO Name Can't be empty`
+      })
+    }
+  }
   const userId = getUserId(event)
   logger.info(`Create Todo for user ${userId} with data ${newTodo}`)
 
